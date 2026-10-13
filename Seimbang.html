@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f7f2">
+<title>Seimbang — Your Profile</title>
+<style>
+  :root { --bg:#f6f7f2; --surface:#fff; --ink:#182e2b; --muted:#6a7a76; --green:#215f4d; --accent:#bdf076; --mint:#edf7ec; --line:#e4eae3; --peach:#ffeddb; --shadow:0 8px 34px rgba(22,57,43,.055); }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.45; }
+  button,input,select,textarea { font:inherit; }
+  button { cursor:pointer; }
+  button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible,textarea:focus-visible { outline:3px solid #95c98a; outline-offset:3px; }
+  a { color:inherit; }
+  .shell { display:grid; grid-template-columns:245px minmax(0,1fr); min-height:100vh; }
+  aside { background:#173c32; color:#dceee4; padding:29px 20px; position:sticky; top:0; height:100vh; display:flex; flex-direction:column; z-index:4; }
+  .brand { display:flex; align-items:center; gap:11px; padding:0 12px; margin-bottom:58px; text-decoration:none; }
+  .brand-symbol { width:35px; height:35px; border-radius:12px; background:var(--accent); color:#173c32; display:grid; place-items:center; font-size:23px; font-weight:800; }
+  .brand-word { font-size:25px; font-weight:780; letter-spacing:-1.5px; color:#fff; }
+  .brand-word small { color:var(--accent); }
+  .side-label { padding:0 12px; font-size:10px; letter-spacing:2px; opacity:.53; font-weight:750; margin:0 0 14px; }
+  .nav-link { display:flex; align-items:center; gap:12px; padding:12px; border-radius:12px; text-decoration:none; color:#c6ddd2; margin:2px 0; font-size:14px; font-weight:550; }
+  .nav-link.active,.nav-link:hover { background:#285748; color:#fff; }
+  .nav-link .nav-icon { font-size:18px; width:22px; text-align:center; }
+  .side-bottom { margin-top:auto; background:#245445; padding:18px; border-radius:17px; }
+  .side-bottom .star { display:inline-flex; width:35px; height:35px; align-items:center; justify-content:center; background:#3f6956; border-radius:11px; font-size:20px; margin-bottom:13px; }
+  .side-bottom strong { color:#fff; font-size:13px; display:block; margin-bottom:5px; }
+  .side-bottom p { color:#c1dbcd; font-size:12px; margin:0; line-height:1.65; }
+  main { width:min(1320px,100%); padding:34px 46px 70px; margin:0 auto; }
+  .topbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:15px; margin-bottom:26px; }
+  .eyebrow { color:#66937e; letter-spacing:1.9px; font-size:11px; font-weight:850; text-transform:uppercase; }
+  .topbar-title { font-size:14px; font-weight:750; margin-top:4px; }
+  .topbar-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  .date-wrap { background:white; border:1px solid var(--line); border-radius:12px; padding:7px 11px; display:flex; align-items:center; gap:8px; color:var(--green); }
+  .date-wrap input { border:0; background:none; outline:none; color:var(--ink); font-size:13px; font-weight:600; width:129px; }
+  .tag { font-size:11px; background:#eaf5e5; color:#316c50; padding:9px 12px; border-radius:999px; font-weight:800; letter-spacing:.1px; }
+  .hero { background:#204e3f; border-radius:24px; color:#fff; min-height:228px; display:flex; align-items:center; justify-content:space-between; gap:18px; overflow:hidden; position:relative; padding:37px 41px; isolation:isolate; }
+  .hero::after { content:""; position:absolute; width:370px; height:370px; border:55px solid rgba(192,239,119,.10); border-radius:50%; right:-80px; top:-130px; z-index:-1; }
+  .hero::before { content:""; position:absolute; width:230px; height:230px; border:1px solid rgba(195,239,129,.23); border-radius:50%; right:69px; bottom:-170px; z-index:-1; }
+  .hero-content { max-width:510px; }
+  .hero .eyebrow { color:#bbf08a; }
+  .hero h1 { font-size:clamp(28px,3.4vw,42px); line-height:1.13; letter-spacing:-1.3px; font-weight:790; margin:12px 0 13px; }
+  .hero h1 em { color:#caf48f; font-style:normal; }
+  .hero p { margin:0; color:#d1e3d9; font-size:14px; max-width:450px; line-height:1.75; }
+  .hero-visual { display:flex; align-items:center; justify-content:center; flex:0 0 210px; }
+  .visual-circle { width:178px; height:178px; border-radius:50%; background:#b9e98a; display:grid; place-items:center; position:relative; transform:rotate(-8deg); box-shadow:inset 0 0 0 13px rgba(255,255,255,.17); }
+  .visual-circle span { font-size:77px; transform:rotate(8deg); }
+  .visual-circle::before,.visual-circle::after { content:"✦"; position:absolute; color:#fff; font-size:30px; }
+  .visual-circle::before { top:-7px; left:-34px; } .visual-circle::after { right:-25px; bottom:0; font-size:24px; }
+  .section-heading { display:flex; justify-content:space-between; align-items:end; gap:14px; margin:30px 0 15px; }
+  h2 { font-size:20px; margin:0; letter-spacing:-.5px; }
+  .subtle { color:var(--muted); font-size:13px; margin:4px 0 0; }
+  .stat-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; }
+  .stat-card { background:#fff; border:1px solid var(--line); border-radius:17px; padding:19px 20px; box-shadow:var(--shadow); min-width:0; }
+  .stat-top { display:flex; justify-content:space-between; gap:6px; align-items:center; }
+  .stat-label { color:var(--muted); font-size:12px; font-weight:650; }
+  .stat-icon { display:grid; place-items:center; width:32px; height:32px; background:#edf6ec; border-radius:10px; font-size:18px; }
+  .stat-value { font-size:31px; letter-spacing:-1px; line-height:1.2; font-weight:790; margin-top:12px; }
+  .stat-value small { font-size:12px; color:var(--muted); letter-spacing:0; font-weight:600; }
+  .stat-foot { color:#75887c; font-size:11px; margin-top:8px; }
+  .content-grid { display:grid; grid-template-columns:1.15fr .85fr; align-items:start; gap:17px; }
+  .panel { background:#fff; border:1px solid var(--line); border-radius:20px; padding:24px; box-shadow:var(--shadow); min-width:0; }
+  .panel-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:20px; }
+  .panel-title { font-size:17px; font-weight:780; letter-spacing:-.45px; margin:0; }
+  .panel-kicker { font-size:12px; color:var(--muted); margin:4px 0 0; }
+  .tiny-pill { border-radius:999px; font-size:11px; font-weight:800; background:var(--mint); color:var(--green); padding:6px 9px; white-space:nowrap; }
+  label { display:block; font-size:12px; color:#526a60; font-weight:750; margin:0 0 8px; }
+  .field { margin-bottom:15px; }
+  input[type=text],input[type=number],select,textarea { background:#fafcf9; width:100%; border:1px solid #dfe9de; border-radius:11px; padding:12px 12px; color:var(--ink); outline:none; font-size:14px; }
+  input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus { border-color:#78aa82; box-shadow:0 0 0 3px #eff8ed; }
+  select { cursor:pointer; }
+  .form-grid { display:grid; grid-template-columns:1fr 110px; gap:12px; }
+  .custom-grid { display:none; grid-template-columns:1fr 118px; gap:12px; } .custom-grid.visible { display:grid; }
+  .btn { border:0; color:#fff; border-radius:12px; padding:13px 18px; font-weight:750; background:var(--green); transition:transform .14s,filter .14s; font-size:13px; }
+  .btn:hover { filter:brightness(1.12); transform:translateY(-1px); }
+  .btn:active { transform:translateY(0); }
+  .btn-inline { display:inline-flex; align-items:center; gap:8px; justify-content:center; }
+  .secondary-btn { background:#eff6ed; color:#255b47; }
+  .text-btn { border:0; background:transparent; color:#668b74; font-size:12px; font-weight:750; cursor:pointer; padding:6px; }
+  .text-btn:hover { color:#aa5036; }
+  .full { width:100%; }
+  .info { display:flex; gap:9px; background:#f6f9f2; color:#627a67; font-size:11px; line-height:1.55; border-radius:11px; padding:12px; margin-top:16px; }
+  .meals { min-height:160px; }
+  .meal { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0; border-bottom:1px solid var(--line); }
+  .meal:last-child { border-bottom:0; }
+  .meal-icon { display:grid; place-items:center; background:#f3f7ed; border-radius:11px; width:41px; height:41px; font-size:21px; flex-shrink:0; }
+  .meal-info { flex:1; min-width:0; }
+  .meal-name { font-weight:730; font-size:13px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden; }
+  .meal-detail { font-size:11px; color:var(--muted); margin-top:4px; }
+  .meal-right { display:flex; align-items:center; gap:7px; }
+  .meal-right strong { font-size:13px; white-space:nowrap; }
+  .remove { background:#f8f4f1; color:#a97166; border:0; width:27px; height:27px; border-radius:8px; display:grid; place-items:center; font-size:16px; }
+  .remove:hover { background:#f9e1db; }
+  .empty { text-align:center; padding:25px 14px; border:1px dashed #dce8d7; border-radius:14px; color:var(--muted); font-size:13px; }
+  .empty span { display:block; font-size:27px; margin-bottom:8px; }
+  .meal-total { display:flex; justify-content:space-between; align-items:center; padding-top:17px; margin-top:9px; border-top:1px solid var(--line); font-size:13px; font-weight:720; }
+  .meal-total strong { font-size:19px; color:var(--green); }
+  .routine-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:11px; }
+  .field-card { padding:13px; background:#f8faf6; border:1px solid #e9eee8; border-radius:13px; }
+  .field-card label { color:#496555; font-size:11px; margin-bottom:9px; }
+  .field-card input { background:#fff; font-size:16px; font-weight:750; text-align:center; padding:10px 3px; }
+  .routine-summary { background:#f5f8f2; border-radius:15px; padding:18px; margin-top:20px; }
+  .routine-title { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
+  .routine-title strong { font-size:12px; }
+  .routine-title small { color:#708177; font-size:11px; }
+  .timebar { display:flex; overflow:hidden; border-radius:999px; height:15px; background:#e4ebe0; }
+  .timebar span { display:block; height:100%; transition:width .2s ease; min-width:0; }
+  .legend { display:flex; flex-wrap:wrap; gap:9px 13px; margin-top:14px; }
+  .legend span { color:#657b6d; font-size:10px; white-space:nowrap; display:flex; align-items:center; gap:5px; }
+  .dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .reflection { display:flex; gap:12px; margin-top:18px; padding:16px; background:#fff7ed; border-radius:14px; border:1px solid #f4e7d7; align-items:start; }
+  .reflection strong { font-size:12px; color:#8d603c; }
+  .reflection p { font-size:12px; line-height:1.6; color:#806d5a; margin:5px 0 0; }
+  .mood-options { display:flex; flex-wrap:wrap; gap:8px; margin:11px 0 17px; }
+  .mood-option { flex:1; white-space:nowrap; background:#f8faf7; color:#526b5b; border:1px solid #e5ede2; border-radius:11px; font-size:12px; font-weight:680; padding:10px 6px; }
+  .mood-option[aria-pressed=true] { background:#e5f3df; border-color:#8fb886; color:#255d42; }
+  textarea { resize:vertical; min-height:77px; }
+  .routine-bottom { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:17px; }
+  .save-status { font-size:11px; color:#648773; }
+  .philosophy { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .phil-card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .phil-card-icon { font-size:24px; margin-bottom:10px; }
+  .phil-card h3 { font-size:13px; margin:0 0 5px; }
+  .phil-card p { margin:0; font-size:12px; color:var(--muted); line-height:1.7; }
+  footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; color:#84968d; font-size:11px; margin-top:28px; }
+  #toast { position:fixed; bottom:25px; right:25px; padding:13px 17px; background:#193d31; color:#fff; font-size:12px; border-radius:12px; box-shadow:0 12px 28px #20372833; opacity:0; pointer-events:none; transform:translateY(10px); transition:opacity .2s, transform .2s; z-index:20; }
+  #toast.show { opacity:1; transform:translateY(0); }
+  @media(max-width:1130px) { main { padding:28px 28px 60px; } .stat-grid { grid-template-columns:repeat(2,1fr); } .content-grid { grid-template-columns:1fr; } .panel { padding:22px; } }
+  @media(max-width:760px) { .shell { display:block; } aside { height:auto; padding:12px 16px; position:static; flex-direction:row; align-items:center; justify-content:space-between; } .brand { margin:0; padding:0; } .brand-word { font-size:22px; } .brand-symbol { width:31px; height:31px; } .side-label,.side-bottom { display:none; } nav { display:flex; gap:3px; } .nav-link { margin:0; padding:9px; } .nav-link .nav-icon { font-size:17px; width:auto; } .nav-text { display:none; } main { padding:20px 16px 40px; } .topbar { align-items:start; } .hero { padding:27px 24px; min-height:210px; } .hero-visual { display:none; } .hero h1 { font-size:31px; } .section-heading { margin-top:24px; } .philosophy { grid-template-columns:1fr; } }
+  @media(max-width:430px) { .stat-grid { gap:9px; } .stat-card { padding:15px 12px; } .stat-value { font-size:25px; } .stat-label { font-size:11px; } .routine-grid { gap:6px; } .field-card { padding:8px; } .panel { padding:17px; } .form-grid { grid-template-columns:1fr 80px; gap:9px; } .custom-grid { grid-template-columns:1fr 95px; } .topbar-actions { gap:7px; } .tag { font-size:10px; padding:8px; } .hero h1 { font-size:28px; } .mood-option { min-width:65px; } }
+
+  /* The welcome/profile step is a separate screen, not a static modal. */
+  .profile-page[hidden] { display:none!important; }
+  body.setup-open .shell { display:none; }
+  .profile-page { min-height:100vh; display:grid; grid-template-columns:minmax(320px,.91fr) minmax(480px,1.09fr); background:#f8f9f4; }
+  .profile-story { padding:clamp(34px,5vw,78px); color:#fff; background:#173e33; display:flex; flex-direction:column; gap:48px; min-height:100vh; position:relative; overflow:hidden; isolation:isolate; }
+  .profile-story::before { content:""; position:absolute; width:480px; height:480px; border:1px solid rgba(196,237,156,.17); border-radius:50%; left:-175px; bottom:-245px; box-shadow:0 0 0 75px rgba(196,237,156,.035),0 0 0 145px rgba(196,237,156,.025); z-index:-1; }
+  .story-brand { display:flex; align-items:center; gap:12px; font-weight:800; font-size:27px; letter-spacing:-1.5px; }
+  .story-brand span { width:40px; height:40px; border-radius:13px; display:grid; place-items:center; color:#173e33; background:#c6ee88; font-size:22px; }
+  .story-copy { margin:auto 0; max-width:520px; }
+  .story-eyebrow { font-size:11px; color:#c5ef90; font-weight:850; letter-spacing:2.5px; text-transform:uppercase; }
+  .story-copy h1 { font-size:clamp(41px,4.3vw,69px); font-weight:820; line-height:1.08; letter-spacing:-2.8px; margin:25px 0; }
+  .story-copy h1 em { color:#c8f196; font-style:normal; }
+  .story-copy p { font-size:15px; color:#c9dfd3; line-height:1.85; max-width:460px; }
+  .story-mini { margin-top:36px; display:flex; align-items:center; gap:15px; padding:20px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:19px; max-width:395px; }
+  .story-mini-icon { display:grid; place-items:center; height:52px; width:52px; flex-shrink:0; background:#c9ee98; color:#1e533e; border-radius:16px; font-size:27px; }
+  .story-mini strong { display:block; font-size:14px; color:#fff; }
+  .story-mini small { display:block; margin-top:4px; color:#bfd4c9; font-size:12px; line-height:1.5; }
+  .story-footer { font-size:11px; color:#bed6c6; }
+  .profile-form-side { display:flex; align-items:center; justify-content:center; padding:48px 32px 70px; }
+  .setup-content { width:min(520px,100%); }
+  .setup-meta { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:19px; }
+  .setup-step { color:#33775c; font-size:11px; font-weight:820; letter-spacing:1.3px; text-transform:uppercase; }
+  .setup-content h2 { font-size:clamp(29px,3vw,39px); line-height:1.17; letter-spacing:-1.4px; margin:0 0 10px; }
+  .setup-intro { font-size:13px; color:#73837a; line-height:1.7; margin:0 0 25px; }
+  .setup-fields { display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
+  .setup-fields .field { margin-bottom:17px; }
+  .setup-fields label { color:#385747; font-size:12px; }
+  .setup-fields input,.setup-fields select { background:#fff; padding:13px 14px; }
+  .setup-fields .wide { grid-column:1/-1; }
+  .setup-caption { color:#86918b; font-size:11px; line-height:1.6; margin:5px 0 0; }
+  .estimate-preview { background:#eaf5e5; border:1px solid #d8eaca; display:flex; gap:12px; align-items:center; justify-content:space-between; padding:17px; border-radius:15px; margin:5px 0 18px; }
+  .estimate-preview .preview-label { font-size:12px; font-weight:760; color:#315a45; }
+  .estimate-preview .preview-explain { font-size:11px; line-height:1.55; color:#6a8571; margin-top:4px; max-width:255px; }
+  .estimate-preview strong { color:#205743; font-size:24px; letter-spacing:-.7px; white-space:nowrap; text-align:right; }
+  .estimate-preview strong small { display:block; font-size:10px; font-weight:700; letter-spacing:0; color:#66836a; }
+  .setup-primary { width:100%; padding:16px; border-radius:13px; font-size:14px; }
+  .setup-alt { display:block; width:100%; margin-top:14px; text-align:center; color:#51816d; }
+  .profile-error { color:#a34530; background:#fff0e8; padding:10px 12px; border-radius:10px; font-size:12px; margin-bottom:14px; }
+  .setup-fields [aria-invalid=true] { border-color:#b9503e!important; background:#fff7f3!important; box-shadow:0 0 0 2px #ffdbd0!important; }
+  .goal-strip { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:center; margin-top:18px; padding:22px 24px; background:#fff; border:1px solid var(--line); box-shadow:var(--shadow); border-radius:20px; }
+  .goal-label { color:#3e7a60; font-size:11px; font-weight:790; letter-spacing:1px; text-transform:uppercase; }
+  .goal-number { font-size:30px; letter-spacing:-1.2px; font-weight:830; line-height:1.4; }
+  .goal-number span { font-size:12px; color:var(--muted); letter-spacing:0; }
+  .goal-help { font-size:11px; color:var(--muted); line-height:1.55; }
+  .goal-right { padding-left:8px; }
+  .goal-top { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:12px; font-weight:700; margin-bottom:11px; }
+  .goal-top .muted { color:var(--muted); font-weight:600; }
+  .goal-track { height:12px; border-radius:99px; background:#ebf0e8; overflow:hidden; }
+  .goal-fill { width:0; height:100%; border-radius:99px; background:linear-gradient(90deg,#2d8061,#a8d97a); transition:width .2s; }
+  .profile-chip { background:#edf6e9; color:#2f7255; display:inline-flex; align-items:center; gap:6px; border:1px solid #dcebd8; padding:9px 12px; border-radius:12px; font-size:12px; font-weight:780; }
+  .profile-chip:hover { background:#d8ebd1; }
+  @media(max-width:1020px) { .profile-page { grid-template-columns:1fr; } .profile-story { min-height:unset; padding:27px 28px; gap:0; } .story-brand { font-size:22px; } .story-copy { margin:18px 0 0; } .story-copy h1 { font-size:32px; margin:12px 0; letter-spacing:-1px; } .story-copy p { margin-bottom:0; font-size:13px; } .story-mini,.story-footer { display:none; } .profile-form-side { padding:35px 28px 60px; align-items:start; } }
+  @media(max-width:650px) { .setup-fields { grid-template-columns:1fr 1fr; column-gap:12px; } .goal-strip { grid-template-columns:1fr; gap:15px; } .goal-right { padding-left:0; } .profile-form-side { padding:27px 18px 44px; } .profile-story { padding:20px 18px; } .story-copy h1 { font-size:26px; } .story-copy p { display:none; } .setup-content h2 { font-size:29px; } .estimate-preview strong { font-size:22px; } .profile-chip { padding:9px; } }
+  @media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; } }
+
+  /* Supportive calorie check-in, updated with each food journal change. */
+  .calorie-feedback { margin-top:14px; border-radius:19px; border:1px solid #dce8dc; background:#f2f7f0; display:flex; align-items:center; gap:18px; padding:22px 23px; box-shadow:var(--shadow); transition:background .2s,border-color .2s; }
+  .feedback-icon { width:49px; height:49px; border-radius:15px; background:#e1eedf; display:grid; place-items:center; flex-shrink:0; font-size:25px; }
+  .feedback-copy { flex:1; min-width:0; }
+  .feedback-eyebrow { display:flex; align-items:center; flex-wrap:wrap; gap:9px; margin-bottom:7px; font-size:10px; font-weight:850; letter-spacing:1.2px; text-transform:uppercase; color:#567761; }
+  .feedback-pill { padding:5px 9px; border-radius:999px; background:#e0eddd; color:#33674f; font-size:10px; letter-spacing:0; font-weight:800; text-transform:none; }
+  .feedback-copy h3 { margin:0 0 6px; font-size:17px; font-weight:780; line-height:1.3; letter-spacing:-.35px; }
+  .feedback-copy p { margin:0; color:#62786c; font-size:12px; line-height:1.7; max-width:710px; }
+  .feedback-aside { border-left:1px solid #d5e4d3; min-width:137px; padding-left:20px; text-align:right; }
+  .feedback-aside strong { display:block; font-weight:840; font-size:27px; letter-spacing:-1px; color:#2b6c52; white-space:nowrap; }
+  .feedback-aside small { display:block; color:#70867a; margin-top:3px; font-size:11px; line-height:1.35; }
+  .calorie-feedback[data-state="above"] { background:#fff8ed; border-color:#f0dfc9; }
+  .calorie-feedback[data-state="above"] .feedback-icon,.calorie-feedback[data-state="above"] .feedback-pill { background:#faead5; color:#825d35; }
+  .calorie-feedback[data-state="above"] .feedback-aside { border-color:#ebd9be; }
+  .calorie-feedback[data-state="above"] .feedback-aside strong { color:#986436; }
+  .calorie-feedback[data-state="near"] { background:#edf7e9; border-color:#d4e9d0; }
+  .calorie-feedback[data-state="near"] .feedback-icon,.calorie-feedback[data-state="near"] .feedback-pill { background:#d9ebd2; }
+  @media(max-width:650px) { .calorie-feedback { padding:17px; align-items:flex-start; gap:12px; } .feedback-icon { height:38px; width:38px; font-size:21px; border-radius:11px; } .feedback-aside { min-width:0; padding-left:12px; } .feedback-aside strong { font-size:19px; } .feedback-copy h3 { font-size:15px; } }
+  @media(max-width:430px) { .calorie-feedback { flex-wrap:wrap; } .feedback-aside { border-left:0; border-top:1px solid #d9e5d8; padding:10px 0 0; text-align:left; flex:1 1 100%; margin-left:50px; } .feedback-aside strong { font-size:20px; } }
+
+#profilePage[hidden],#dashboardPage[hidden]{display:none!important;}
+</style>
+</head>
+<body>
+<div id="profilePage" class="profile-page">
+  <section class="profile-story" aria-label="Welcome to Seimbang">
+    <div class="story-brand"><span>✳</span>seimbang.</div>
+    <div class="story-copy">
+      <div class="story-eyebrow">A healthier balance starts here</div>
+      <h1>One small step.<br><em>A more balanced you.</em></h1>
+      <p>Discover an estimated daily energy need that fits your body and routine — then keep track of your meals, rest and movement, all in one welcoming space.</p>
+      <div class="story-mini"><div class="story-mini-icon">🌱</div><div><strong>Your wellness, your way</strong><small>Built for mindful habits, not strict dieting or perfection.</small></div></div>
+    </div>
+    <div class="story-footer">UiTM • Philosophy & Current Issues innovation project</div>
+  </section>
+  <section class="profile-form-side" aria-labelledby="setupTitle">
+    <div class="setup-content">
+      <div class="setup-meta"><span class="setup-step">Personalise your experience • Step 1 of 1</span><a class="text-btn" id="cancelProfile" href="#overview" hidden>← Back to dashboard</a></div>
+      <h2 id="setupTitle">Tell us a little about yourself.</h2>
+      <p class="setup-intro">These details help us estimate the calories your body uses in a typical day. You can change them anytime.</p>
+      <form id="profileForm" >
+        <div class="setup-fields">
+          <div class="field"><label for="profileSex">Sex used for calculation</label><select id="profileSex" name="sex" required><option value="">Select an option</option><option value="male">Male formula</option><option value="female">Female formula</option><option value="range">Prefer not to specify (show range)</option></select></div>
+          <div class="field"><label for="profileAge">Age (years)</label><input id="profileAge" name="age" type="number" inputmode="numeric" min="18" max="80" step="1" placeholder="e.g. 22" required></div>
+          <div class="field"><label for="profileWeight">Weight (kg)</label><input id="profileWeight" name="weight" type="number" inputmode="decimal" min="25" max="350" step="0.1" placeholder="e.g. 65" required></div>
+          <div class="field"><label for="profileHeight">Height (cm)</label><input id="profileHeight" name="height" type="number" inputmode="decimal" min="120" max="230" step="0.1" placeholder="e.g. 170" required></div>
+          <div class="field wide"><label for="profileActivity">Your usual activity level</label><select id="profileActivity" name="activity" required><option value="">Choose an activity level</option><option value="sedentary">Mostly sitting — little exercise</option><option value="light">Lightly active — exercise 1–3 days/week</option><option value="moderate">Moderately active — exercise 3–5 days/week</option><option value="very">Very active — exercise 6–7 days/week</option></select><p class="setup-caption">Choose your usual lifestyle, not just the activity you did today.</p></div>
+        </div>
+        <div class="estimate-preview" aria-live="polite">
+          <div><div class="preview-label">Estimated daily maintenance calories</div><div class="preview-explain" id="previewExplain">Fill in your details to see your estimate.</div></div>
+          <strong><span id="previewKcal">—</span><small>kcal / day</small></strong>
+        </div>
+        <div id="profileError" class="profile-error" role="alert" hidden></div>
+        <button class="btn setup-primary" type="submit">Save profile & open dashboard →</button>
+        <a id="demoProfile" href="#overview" class="text-btn setup-alt">⚡ Open dashboard with a sample student profile</a>
+        <p class="setup-caption" style="text-align:center;margin-top:15px">For adults aged 18+. Estimates are general guidance, not a prescribed calorie limit. Not intended for pregnancy, breastfeeding, or individual medical needs. Stored only in your browser.</p>
+      </form>
+    </div>
+  </section>
+</div>
+<div id="dashboardPage" hidden>
+<div class="shell">
+  <aside>
+    <a class="brand" href="#overview"><span class="brand-symbol">✳</span><span class="brand-word">seimbang<small>.</small></span></a>
+    <nav aria-label="Sections">
+      <div class="side-label">YOUR SPACE</div>
+      <a class="nav-link active" href="#overview"><span class="nav-icon">◫</span><span class="nav-text">Overview</span></a>
+      <a class="nav-link" href="#food"><span class="nav-icon">♧</span><span class="nav-text">Food journal</span></a>
+      <a class="nav-link" href="#balance"><span class="nav-icon">◷</span><span class="nav-text">Daily balance</span></a>
+      <a class="nav-link" href="#purpose"><span class="nav-icon">✦</span><span class="nav-text">Our purpose</span></a>
+    </nav>
+    <div class="side-bottom"><span class="star">🌱</span><strong>Progress, not perfection.</strong><p>Healthy living is more than counting calories. It's making space for your whole self.</p></div>
+  </aside>
+  <main>
+    <header class="topbar" id="overview">
+      <div><div class="eyebrow">UiTM • Innovation concept</div><div class="topbar-title">Your daily wellness space</div></div>
+      <div class="topbar-actions"><label class="date-wrap" aria-label="Select journal date"><span>▦</span><input id="dayPicker" type="date" aria-label="Journal date"></label><a id="editProfile" class="profile-chip" href="#profile">⚙ My profile</a><span class="tag">✳ Working prototype</span></div>
+    </header>
+    <section class="hero" aria-labelledby="mainTitle">
+      <div class="hero-content"><div class="eyebrow">A better way to find balance</div><h1 id="mainTitle">Eat mindfully.<br><em>Live fully.</em></h1><p>Track what you eat, reflect on your routine, and make room for the things that matter. One balanced day at a time.</p></div>
+      <div class="hero-visual" aria-hidden="true"><div class="visual-circle"><span>🥑</span></div></div>
+    </section>
+    <div id="profileNotice" hidden style="margin:0 0 16px; padding:14px 16px; border:1px solid #d8eaca; background:#eaf5e5; border-radius:12px; font-size:13px;">Viewing a sample profile. <a href="#profile" style="text-decoration:underline; font-weight:700;">Create your own profile</a> for a personalised estimate.</div>
+<section class="goal-strip" aria-label="Personal daily energy estimate">
+      <div><div class="goal-label">✦ Your personalised daily energy guide</div><div class="goal-number"><span id="dailyTarget">—</span> <span>kcal / day</span></div><div class="goal-help" id="goalContext">An estimate to maintain your current weight, not a calorie restriction.</div></div>
+      <div class="goal-right"><div class="goal-top"><span>Food logged today</span><span class="muted" id="goalProgressLabel">0 kcal logged</span></div><div class="goal-track" id="goalTrack" role="progressbar" aria-label="Meals logged compared with estimated daily maintenance calories" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="goal-fill" id="goalFill"></div></div><div class="goal-help" style="margin-top:9px">Your daily needs can vary. This is a comparison, not a score.</div></div>
+    </section>
+    <section id="calorieFeedback" class="calorie-feedback" data-state="empty" aria-label="Your calorie check-in" aria-live="polite" aria-atomic="true">
+      <div id="feedbackIcon" class="feedback-icon" aria-hidden="true">🌿</div>
+      <div class="feedback-copy">
+        <div class="feedback-eyebrow">YOUR CALORIE CHECK-IN <span id="feedbackPill" class="feedback-pill">Ready when you are</span></div>
+        <h3 id="feedbackTitle">Start with a meal, not a perfect number.</h3>
+        <p id="feedbackMessage">Log your meals to see how your food intake compares with your personalised maintenance estimate.</p>
+      </div>
+      <div class="feedback-aside"><strong id="feedbackDifference">—</strong><small id="feedbackDifferenceCaption">Your daily estimate is a guide</small></div>
+    </section>
+    <div class="section-heading"><div><h2>Daily snapshot</h2><p class="subtle">A gentle overview of your logged habits.</p></div><button class="text-btn" id="clearDay">Clear this day ↺</button></div>
+    <section class="stat-grid" aria-label="Daily summary">
+      <article class="stat-card"><div class="stat-top"><div class="stat-label">Calories eaten</div><div class="stat-icon">🍽️</div></div><div class="stat-value"><span id="statCalories">0</span> <small>kcal</small></div><div class="stat-foot">Estimated from meals logged</div></article>
+      <article class="stat-card"><div class="stat-top"><div class="stat-label">Meals logged</div><div class="stat-icon">🥗</div></div><div class="stat-value" id="statMeals">0</div><div class="stat-foot">Entries in your food journal</div></article>
+      <article class="stat-card"><div class="stat-top"><div class="stat-label">Sleep</div><div class="stat-icon">🌙</div></div><div class="stat-value"><span id="statSleep">0</span> <small>hrs</small></div><div class="stat-foot">Your reported rest time</div></article>
+      <article class="stat-card"><div class="stat-top"><div class="stat-label">Movement</div><div class="stat-icon">🚶</div></div><div class="stat-value"><span id="statMovement">0</span> <small>min</small></div><div class="stat-foot">Your reported activity</div></article>
+    </section>
+    <div class="section-heading" id="food"><div><h2>Food journal</h2><p class="subtle">Simple Malaysian food calorie estimates.</p></div></div>
+    <div class="content-grid">
+      <section class="panel" aria-labelledby="addFoodTitle">
+        <div class="panel-header"><div><h3 class="panel-title" id="addFoodTitle">Add a meal</h3><p class="panel-kicker">Start with a familiar meal, or add your own.</p></div><span class="tiny-pill">🥘 Local favourites</span></div>
+        <form id="mealForm">
+          <div class="form-grid">
+            <div class="field"><label for="foodSelect">Food or drink</label><select id="foodSelect" required></select></div>
+            <div class="field"><label for="servings">Servings</label><input id="servings" type="number" min="0.25" max="20" step="0.25" value="1" required></div>
+          </div>
+          <div id="customFields" class="custom-grid">
+            <div class="field"><label for="customName">Food name</label><input id="customName" type="text" maxlength="65" placeholder="E.g., sandwich"></div>
+            <div class="field"><label for="customCalories">Kcal / serving</label><input id="customCalories" type="number" min="1" max="10000" step="1" placeholder="E.g., 350"></div>
+          </div>
+          <button class="btn btn-inline full" type="submit">＋ Add to my food journal</button>
+        </form>
+        <div class="info"><span>ⓘ</span><span>Food calories are rough estimates, not exact measurements. Portion size, oil, ingredients, and preparation all affect the result. Use a nutrition label or verified database when available.</span></div>
+      </section>
+      <section class="panel" aria-labelledby="mealHistoryTitle">
+        <div class="panel-header"><div><h3 class="panel-title" id="mealHistoryTitle">Today's entries</h3><p class="panel-kicker" id="mealDateLabel">Meals you've added</p></div><span class="tiny-pill" id="mealCount">0 logged</span></div>
+        <div id="mealList" class="meals" aria-live="polite"></div>
+        <div class="meal-total"><span>Estimated total</span><strong id="mealTotal">0 kcal</strong></div>
+      </section>
+    </div>
+    <div class="section-heading" id="balance"><div><h2>Life beyond the plate</h2><p class="subtle">A healthy routine is about time and well-being too.</p></div></div>
+    <div class="content-grid">
+      <section class="panel" aria-labelledby="routineTitle">
+        <div class="panel-header"><div><h3 class="panel-title" id="routineTitle">Your 24-hour check-in</h3><p class="panel-kicker">Reflect on where the day went.</p></div><span class="tiny-pill">⏱ Time balance</span></div>
+        <form id="routineForm">
+          <div class="routine-grid">
+            <div class="field-card"><label for="sleepHrs">🌙 Sleep (hrs)</label><input id="sleepHrs" type="number" step="0.5" min="0" max="24" value="0" required></div>
+            <div class="field-card"><label for="studyHrs">📚 Work / study (hrs)</label><input id="studyHrs" type="number" step="0.5" min="0" max="24" value="0" required></div>
+            <div class="field-card"><label for="activityMins">🚶 Activity (min)</label><input id="activityMins" type="number" step="5" min="0" max="1440" value="0" required></div>
+          </div>
+          <div class="routine-summary">
+            <div class="routine-title"><strong>Your day at a glance</strong><small id="timeUsed">0h / 24h logged</small></div>
+            <div class="timebar" role="img" aria-label="Daily time breakdown"><span id="sleepBar" style="background:#45876b"></span><span id="studyBar" style="background:#e2ad78"></span><span id="activityBar" style="background:#9cc570"></span><span id="otherBar" style="background:#dfe7d8"></span></div>
+            <div class="legend"><span><i class="dot" style="background:#45876b"></i>Sleep</span><span><i class="dot" style="background:#e2ad78"></i>Work / study</span><span><i class="dot" style="background:#9cc570"></i>Activity</span><span><i class="dot" style="background:#dfe7d8"></i>Other / unlogged</span></div>
+          </div>
+          <div id="routineError" style="color:#ba4d3f;font-size:12px;margin-top:11px;display:none" role="alert"></div>
+          <div class="routine-bottom"><span class="save-status" id="routineStatus">Fill in your routine</span><button class="btn" type="submit">Save check-in</button></div>
+        </form>
+      </section>
+      <section class="panel" aria-labelledby="reflectTitle">
+        <div class="panel-header"><div><h3 class="panel-title" id="reflectTitle">Mind & mood check-in</h3><p class="panel-kicker">How are you feeling today?</p></div><span class="tiny-pill">💚 Self-reflection</span></div>
+        <label>Choose the feeling closest to your day</label>
+        <div class="mood-options" id="moodOptions" role="group" aria-label="Mood options">
+          <button type="button" class="mood-option" data-mood="Energised" aria-pressed="false">⚡ Energised</button>
+          <button type="button" class="mood-option" data-mood="Okay" aria-pressed="false">🙂 Okay</button>
+          <button type="button" class="mood-option" data-mood="Tired" aria-pressed="false">😴 Tired</button>
+          <button type="button" class="mood-option" data-mood="Stressed" aria-pressed="false">🌧️ Stressed</button>
+        </div>
+        <div class="field"><label for="reflectionNote">One small thing I'll do for myself</label><textarea id="reflectionNote" maxlength="300" placeholder="Take a short walk, eat with friends, get some rest..."></textarea></div>
+        <button class="btn btn-inline secondary-btn full" id="saveReflection" type="button">♡ Save reflection</button>
+        <div class="reflection"><div style="font-size:23px" aria-hidden="true">🌿</div><div><strong>Your health is more than a number</strong><p>Calorie information can be useful, but well-being also includes enough rest, manageable commitments, movement, connection, and how you feel.</p></div></div>
+      </section>
+    </div>
+    <div class="section-heading" id="purpose"><div><h2>Why Seimbang?</h2><p class="subtle">Built around the philosophy of a balanced, flourishing life.</p></div></div>
+    <div class="philosophy">
+      <article class="phil-card"><div class="phil-card-icon">⚖️</div><h3>Falsafah Sejahtera</h3><p>Health is physical, emotional and social well-being—not simply productivity or calorie counts.</p></article>
+      <article class="phil-card"><div class="phil-card-icon">🫶</div><h3>Personal responsibility</h3><p>Helps users notice daily habits and make informed, voluntary choices about their routines.</p></article>
+      <article class="phil-card"><div class="phil-card-icon">🌍</div><h3>Current issues</h3><p>Starts conversations about student stress, irregular meals, sedentary lifestyles and work-life balance.</p></article>
+    </div>
+    <footer><span>Seimbang • UiTM Philosophy & Current Issues innovation concept</span><span>Demo only • Stored locally in this browser • Not medical advice</span></footer>
+  </main>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+</div>
+<script>
+
+(function(){
+'use strict';
+const catalog=[
+  {id:'nasi-lemak',name:'Nasi lemak',cal:450,emoji:'🍛'},
+  {id:'nasi-ayam',name:'Nasi ayam',cal:600,emoji:'🍗'},
+  {id:'roti-canai',name:'Roti canai',cal:300,emoji:'🫓'},
+  {id:'mee-goreng',name:'Mee goreng',cal:550,emoji:'🍜'},
+  {id:'nasi-putih',name:'Nasi putih',cal:200,emoji:'🍚'},
+  {id:'ayam-penyet',name:'Ayam penyet (meal)',cal:700,emoji:'🍗'},
+  {id:'telur',name:'Boiled egg',cal:78,emoji:'🥚'},
+  {id:'pisang',name:'Banana',cal:105,emoji:'🍌'},
+  {id:'teh-tarik',name:'Teh tarik',cal:180,emoji:'🫖'},
+  {id:'kopi-o',name:'Kopi O (unsweetened)',cal:5,emoji:'☕'},
+];
+const STORAGE='seimbang-v1';
+const $=id=>document.getElementById(id);
+const select=$('foodSelect');
+const safeText=(str)=>String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function todayMY(){const fmt=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'});const parts=Object.fromEntries(fmt.formatToParts(new Date()).map(x=>[x.type,x.value]));return `${parts.year}-${parts.month}-${parts.day}`;}
+let selectedDate=todayMY();
+let storage={}; try { const raw=JSON.parse(localStorage.getItem(STORAGE)||'{}'); if(raw&&typeof raw==='object'&&!Array.isArray(raw)) storage=raw; } catch(e) {}
+let timer;
+const initial=Object.keys(storage).length===0;
+const dayDefault=()=>({meals:[],routine:{sleep:0,study:0,activity:0},mood:'',note:''});
+if(initial){storage[selectedDate]={meals:[{id:'sample-1',name:'Nasi lemak',cal:450,qty:1,emoji:'🍛'},{id:'sample-2',name:'Nasi ayam',cal:600,qty:1,emoji:'🍗'}],routine:{sleep:7,study:6,activity:35},mood:'Okay',note:'Take a short break between study sessions.'};persist();}
+function validDay(d){if(!d||typeof d!=='object')return dayDefault();return {meals:Array.isArray(d.meals)?d.meals.filter(x=>x&&typeof x.name==='string'&&Number.isFinite(Number(x.cal))&&Number.isFinite(Number(x.qty))).slice(0,100):[],routine:{sleep:Number(d.routine?.sleep)||0,study:Number(d.routine?.study)||0,activity:Number(d.routine?.activity)||0},mood:typeof d.mood==='string'?d.mood:'',note:typeof d.note==='string'?d.note:''};}
+function day(){if(!storage[selectedDate])storage[selectedDate]=dayDefault();storage[selectedDate]=validDay(storage[selectedDate]);return storage[selectedDate];}
+function persist(){try{localStorage.setItem(STORAGE,JSON.stringify(storage));}catch(e){showToast('Your browser storage is unavailable; changes may not persist.');}}
+function showToast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('show'),2600);}
+function fmt(num){return new Intl.NumberFormat('en-MY',{maximumFractionDigits:1}).format(num);}
+function setNavActive(){let hash=location.hash||'#overview';document.querySelectorAll('.nav-link').forEach(a=>a.classList.toggle('active',a.getAttribute('href')===hash));}
+window.addEventListener('hashchange',setNavActive);
+function renderMeals(){
+  const d=day(),total=d.meals.reduce((acc,m)=>acc+(Number(m.cal)*Number(m.qty)),0);
+  $('statCalories').textContent=fmt(Math.round(total));$('statMeals').textContent=d.meals.length;
+  $('mealCount').textContent=`${d.meals.length} logged`;
+  $('mealTotal').textContent=`${fmt(Math.round(total))} kcal`;
+  renderEnergyGoal(total);
+  $('mealDateLabel').textContent=selectedDate===todayMY()?"Your entries for today":`Your entries for ${selectedDate}`;
+  const list=$('mealList');
+  if(!d.meals.length){list.innerHTML='<div class="empty"><span>🥣</span>No meals logged yet.<br>Add your first meal to get started.</div>';return;}
+  list.innerHTML=d.meals.map(m=>`<div class="meal"><div class="meal-icon" aria-hidden="true">${safeText(m.emoji||'🍽️')}</div><div class="meal-info"><div class="meal-name">${safeText(m.name)}</div><div class="meal-detail">${fmt(m.qty)} serving${m.qty==1?'':'s'} × ${fmt(m.cal)} kcal</div></div><div class="meal-right"><strong>${fmt(Math.round(m.cal*m.qty))} kcal</strong><button class="remove" type="button" data-remove="${safeText(m.id)}" aria-label="Remove ${safeText(m.name)}" title="Remove">×</button></div></div>`).join('');
+}
+function bars(){
+  const sleep=Math.max(0,Number($('sleepHrs').value)||0),study=Math.max(0,Number($('studyHrs').value)||0),activity=Math.max(0,Number($('activityMins').value)||0);
+  const used=sleep+study+activity/60,remaining=Math.max(0,24-used),div=Math.max(24,used);
+  $('timeUsed').textContent=`${fmt(Math.round(used*10)/10)}h / 24h logged`;
+  [['sleepBar',sleep],['studyBar',study],['activityBar',activity/60],['otherBar',remaining]].forEach(([id,v])=>$(id).style.width=`${(v/div)*100}%`);
+  $('routineError').style.display=used>24.00001?'block':'none';
+  $('routineError').textContent='Your entries total more than 24 hours. Please adjust the time values.';
+  return used;
+}
+function renderRoutine(){const d=day(),r=d.routine;$('sleepHrs').value=r.sleep;$('studyHrs').value=r.study;$('activityMins').value=r.activity;$('statSleep').textContent=fmt(r.sleep);$('statMovement').textContent=fmt(r.activity);$('routineStatus').textContent=(r.sleep||r.study||r.activity)?'✓ Check-in saved':'Fill in your routine';bars();}
+function renderMood(){const d=day();document.querySelectorAll('[data-mood]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mood===d.mood)));$('reflectionNote').value=d.note;}
+function render(){renderMeals();renderRoutine();renderMood();}
+function initCatalog(){select.innerHTML=catalog.map(x=>`<option value="${x.id}">${x.name} — ~${x.cal} kcal</option>`).join('')+'<option value="custom">＋ Add custom food</option>';}
+function toggleCustom(){const isCustom=select.value==='custom';$('customFields').classList.toggle('visible',isCustom);$('customName').required=isCustom;$('customCalories').required=isCustom;}
+select.addEventListener('change',toggleCustom);
+$('mealForm').addEventListener('submit',e=>{
+  e.preventDefault();const qty=Number($('servings').value);if(!Number.isFinite(qty)||qty<.25||qty>20)return showToast('Choose 0.25 to 20 servings.');
+  let food;if(select.value==='custom'){
+    const name=$('customName').value.trim(),cal=Number($('customCalories').value);if(!name||!Number.isFinite(cal)||cal<=0||cal>10000)return showToast('Enter a food name and valid kcal value.');
+    food={name,cal,emoji:'🍽️'};
+  }else{food=catalog.find(x=>x.id===select.value);if(!food)return;}
+  const id=String(Date.now())+'-'+String(Math.random()).slice(2);
+  day().meals.push({id,name:food.name,cal:food.cal,qty,emoji:food.emoji});persist();renderMeals();$('mealForm').reset();toggleCustom();showToast('Meal added to your journal!');
+});
+$('mealList').addEventListener('click',e=>{const btn=e.target.closest('[data-remove]');if(!btn)return;const d=day();d.meals=d.meals.filter(x=>x.id!==btn.dataset.remove);persist();renderMeals();showToast('Meal removed.');});
+['sleepHrs','studyHrs','activityMins'].forEach(id=>$(id).addEventListener('input',()=>{$('routineStatus').textContent='Unsaved changes';bars();}));
+$('routineForm').addEventListener('submit',e=>{
+  e.preventDefault();const used=bars();if(used>24.00001||used<0)return showToast('Please review your 24-hour totals.');
+  const r={sleep:Number($('sleepHrs').value),study:Number($('studyHrs').value),activity:Number($('activityMins').value)};
+  if(Object.values(r).some(x=>!Number.isFinite(x)||x<0))return;
+  day().routine=r;persist();renderRoutine();showToast('Routine saved for this day!');
+});
+$('moodOptions').addEventListener('click',e=>{const btn=e.target.closest('[data-mood]');if(!btn)return;day().mood=btn.dataset.mood;persist();renderMood();showToast('Mood saved.');});
+$('saveReflection').addEventListener('click',()=>{day().note=$('reflectionNote').value.trim();persist();showToast('Reflection saved.');});
+$('dayPicker').addEventListener('change',e=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(e.target.value))return;selectedDate=e.target.value;render();});
+$('clearDay').addEventListener('click',()=>{if(!confirm('Clear all meals, routine and reflection for this selected day?'))return;storage[selectedDate]=dayDefault();persist();render();showToast('This day has been cleared.');});
+
+
+
+// Dashboard is a separate page. Native form submission passes profile details via the URL.
+// Storage is optional, so the dashboard stays accessible in restricted browsers.
+const PROFILE_STORAGE='seimbang-profile-v1';
+const activityFactors={sedentary:1.2,light:1.375,moderate:1.55,very:1.725};
+function validProfile(x) {
+  if(!x||typeof x!=='object')return null;
+  const sex=x.sex,age=Number(x.age),weight=Number(x.weight),height=Number(x.height),activity=x.activity;
+  if(!['male','female','range'].includes(sex)||!Number.isInteger(age)||age<18||age>80||!Number.isFinite(weight)||weight<25||weight>350||!Number.isFinite(height)||height<120||height>230||!Object.prototype.hasOwnProperty.call(activityFactors,activity))return null;
+  return {sex,age,weight,height,activity};
+}
+let profile=null;
+try{profile=validProfile(JSON.parse(localStorage.getItem(PROFILE_STORAGE)||'null'));}catch(e){}
+const hadSavedProfile=Boolean(profile);
+if(!profile){
+  profile={sex:'male',age:22,weight:70,height:172,activity:'light'};
+  $('profileNotice').hidden=false;
+}
+function energyEstimate(p){
+  const base=10*p.weight+6.25*p.height-5*p.age;
+  const factor=activityFactors[p.activity];
+  const female=Math.round((base-161)*factor/10)*10;
+  const male=Math.round((base+5)*factor/10)*10;
+  return {low:female,high:male,mid:p.sex==='male'?male:p.sex==='female'?female:Math.round((female+male)/20)*10};
+}
+function energyLabel(p){const e=energyEstimate(p);return p.sex==='range'?`${fmt(e.low)}–${fmt(e.high)}`:`~${fmt(e.mid)}`;}
+// A maintenance calorie estimate is NOT a limit. Messages intentionally avoid
+// implying that an exact daily calorie count is necessary or "perfect".
+function renderCalorieFeedback(total, estimate){
+  const isRange=profile.sex==='range';
+  const lower=isRange?estimate.low:estimate.mid;
+  const upper=isRange?estimate.high:estimate.mid;
+  const rounded=Math.round(total);
+  const feedback=$('calorieFeedback');
+  let state,icon,pill,title,message,difference,caption;
+  if(rounded<=0){
+    state='empty'; icon='🌿'; pill='Ready when you are';
+    title='Start with a meal, not a perfect number.';
+    message='Log your meals to see how your food intake compares with your personalised maintenance estimate.';
+    difference='—'; caption='Your daily estimate is a guide';
+  } else if(total>upper){
+    const extra=Math.round(total-upper);
+    state='above'; icon='🧡'; pill='Above your estimate';
+    title='You went above your estimate — that’s okay!';
+    message=`You’ve logged about ${fmt(extra)} kcal above ${isRange?'the upper end of your estimated range':'your estimated daily maintenance'} today. Day-to-day intake naturally varies; one day does not define your health. Focus on balanced habits over time.`;
+    difference=`+${fmt(extra)} kcal`; caption=isRange?'Above estimated range':'Above estimated maintenance';
+  } else if(total >= (isRange?lower:lower*0.9)){
+    state='near'; icon='💚'; pill='Close to your estimate';
+    title='You’re around your daily estimate!';
+    message=isRange?'Your logged intake falls within the estimated maintenance range. There is no single perfect number — take the rest of your routine into account too.':'Your logged intake is close to your estimated maintenance calories. There’s no need to hit an exact number every day — consistency and well-being matter more.';
+    difference=isRange?'In range':`${fmt(rounded)} kcal`;
+    caption=isRange?'Within estimated range':'Logged today';
+  } else {
+    state='below'; icon='🌱'; pill='Below estimate so far';
+    title='You’re below your estimated daily calories so far.';
+    message='Your food journal may not include everything you’ve eaten yet. Keep logging if you wish, and remember that eating enough to feel energised matters too.';
+    difference=`${fmt(Math.max(0,Math.round(lower-total)))} kcal`;
+    caption=isRange?'Below estimated range':'Below estimated maintenance';
+  }
+  feedback.dataset.state=state;
+  $('feedbackIcon').textContent=icon;
+  $('feedbackPill').textContent=pill;
+  $('feedbackTitle').textContent=title;
+  $('feedbackMessage').textContent=message;
+  $('feedbackDifference').textContent=difference;
+  $('feedbackDifferenceCaption').textContent=caption;
+}
+function renderEnergyGoal(total){
+  const e=energyEstimate(profile),ref=e.mid;
+  $('dailyTarget').textContent=energyLabel(profile);
+  $('goalContext').textContent=profile.sex==='range'?'Range using both calculation options. Actual needs vary.':'Estimated maintenance calories based on your profile, not a strict target.';
+  $('goalProgressLabel').textContent=`${fmt(Math.round(total))} kcal logged`;
+  const percentage=Math.max(0,Math.min(100,ref>0?Math.round(total/ref*100):0));
+  $('goalFill').style.width=percentage+'%';
+  $('goalTrack').setAttribute('aria-valuenow',String(percentage));
+  renderCalorieFeedback(total,e);
+}
+initCatalog();$('dayPicker').value=selectedDate;toggleCustom();render();setNavActive();
+
+// V6: Both pages now live inside ONE HTML file. No separate Dashboard.html needed.
+const form=$('profileForm');
+const formIds=['profileSex','profileAge','profileWeight','profileHeight','profileActivity'];
+const profileKeys={profileSex:'sex',profileAge:'age',profileWeight:'weight',profileHeight:'height',profileActivity:'activity'};
+function fillProfileFields(p){
+  if(!p)return;
+  Object.entries(profileKeys).forEach(([id,key])=>{$(id).value=p[key];});
+}
+if(hadSavedProfile){fillProfileFields(profile);$('cancelProfile').hidden=false;}
+function profileFromForm(){
+  return validProfile({
+    sex:$('profileSex').value,age:$('profileAge').value,
+    weight:$('profileWeight').value,height:$('profileHeight').value,
+    activity:$('profileActivity').value
+  });
+}
+function profilePreview(){
+  const p=profileFromForm();
+  if(!p){$('previewKcal').textContent='—';$('previewExplain').textContent='Fill in your details to see your estimate.';return;}
+  $('previewKcal').textContent=energyLabel(p);
+  $('previewExplain').textContent='Approximate maintenance energy, not a calorie limit.';
+}
+formIds.forEach(id=>{
+  $(id).addEventListener('change',profilePreview);
+  $(id).addEventListener('input',profilePreview);
+});
+profilePreview();
+function showView(view){
+  const isDashboard=view==='dashboard';
+  $('profilePage').hidden=isDashboard;
+  $('dashboardPage').hidden=!isDashboard;
+  document.title=isDashboard?'Seimbang — Wellness Dashboard':'Seimbang — Your Profile';
+  // Navigation is internal: works even on file:// and in restricted previews.
+  window.scrollTo(0,0);
+  if(isDashboard)setNavActive();
+}
+function useProfile(p){
+  profile=p;
+  try{localStorage.setItem(PROFILE_STORAGE,JSON.stringify(p));}catch(e){}
+  $('profileNotice').hidden=true;
+  $('cancelProfile').hidden=false;
+  fillProfileFields(p);
+  profilePreview();
+  $('profileError').hidden=true;
+  showView('dashboard');
+  render();
+}
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const p=profileFromForm();
+  if(!p){
+    $('profileError').textContent='Please complete all fields with valid values, then try again.';
+    $('profileError').hidden=false;
+    return;
+  }
+  useProfile(p);
+});
+$('demoProfile').addEventListener('click',e=>{
+  e.preventDefault();
+  useProfile({sex:'male',age:22,weight:70,height:172,activity:'light'});
+});
+function editProfile(e){
+  e.preventDefault();
+  fillProfileFields(profile);
+  profilePreview();
+  showView('profile');
+}
+$('editProfile').addEventListener('click',editProfile);
+$('profileNotice').querySelector('a').addEventListener('click',editProfile);
+$('cancelProfile').addEventListener('click',e=>{
+  e.preventDefault();
+  showView('dashboard');
+});
+window.addEventListener('hashchange',()=>{
+  if(location.hash==='#profile')showView('profile');
+  else if($('dashboardPage').hidden && location.hash.startsWith('#') && location.hash!=='#profile'){
+    showView('dashboard');
+  }
+});
+// Start on the profile so a person receiving the shared HTML can fill it out.
+// The dashboard appears without navigating away or needing another file.
+showView('profile');
+})();
+</script>
+</body>
+</html>
